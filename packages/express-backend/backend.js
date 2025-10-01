@@ -36,7 +36,7 @@ const users = {
   ],
 };
 
-// Function to find users by name
+// Function to find users by name and job
 const findUserByNameAndJob = (name, job) => {
   return users["users_list"].filter(
     (user) => user["name"] === name && user["job"] === job
@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
   res.send("Hello world!");
 });
 
-//API endpoint to get user by name
+//API endpoint to get user by name and job
 app.get("/users", (req, res) => {
   const name = req.query.name;
   const job = req.query.job;
