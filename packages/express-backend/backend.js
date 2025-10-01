@@ -37,8 +37,10 @@ const users = {
 };
 
 // Function to find users by name
-const findUserByName = (name) => {
-  return users["users_list"].filter((user) => user["name"] === name);
+const findUserByNameAndJob = (name, job) => {
+  return users["users_list"].filter(
+    (user) => user["name"] === name && user["job"] === job
+  );
 };
 
 // Function to find users by ID
@@ -63,8 +65,9 @@ app.get("/", (req, res) => {
 //API endpoint to get user by name
 app.get("/users", (req, res) => {
   const name = req.query.name;
-  if (name != undefined) {
-    let result = findUserByName(name);
+  const job = req.query.job;
+  if (name != undefined && job != undefined) {
+    let result = findUserByNameAndJob(name, job);
     result = { users_list: result };
     res.send(result);
   } else {
