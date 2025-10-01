@@ -5,6 +5,7 @@ const port = 8000;
 
 app.use(express.json());
 
+//List of users
 const users = {
   users_list: [
     {
@@ -35,14 +36,21 @@ const users = {
   ],
 };
 
+// Function to find users by name
 const findUserByName = (name) => {
   return users["users_list"].filter((user) => user["name"] === name);
 };
 
+// Function to find users by ID
+const findUserById = (id) =>
+  users["users_list"].find((user) => user["id"] === id);
+
+// Basic API endpoint
 app.get("/", (req, res) => {
   res.send("Hello world!");
 });
 
+//API endpoint to get user by name
 app.get("/users", (req, res) => {
   const name = req.query.name;
   if (name != undefined) {
@@ -51,6 +59,17 @@ app.get("/users", (req, res) => {
     res.send(result);
   } else {
     res.send(users);
+  }
+});
+
+//API endpoint to get users by ID
+app.get("/users/:id", (req, res) => {
+  const id = req.params.id;
+  let result = findUserById(id);
+  if (result === undefined) {
+    res.status(404).send("Resource not found.");
+  } else {
+    res.send(result);
   }
 });
 
