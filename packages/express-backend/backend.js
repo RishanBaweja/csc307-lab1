@@ -45,6 +45,12 @@ const findUserByName = (name) => {
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
+// Function to addUser to users_list
+const addUser = (user) => {
+  users["users_list"].push(user);
+  return user;
+};
+
 // Basic API endpoint
 app.get("/", (req, res) => {
   res.send("Hello world!");
@@ -71,6 +77,22 @@ app.get("/users/:id", (req, res) => {
   } else {
     res.send(result);
   }
+});
+
+app.post("/users", (req, res) => {
+  const userToAdd = req.body;
+
+  if (
+    !userToAdd ||
+    typeof userToAdd !== "object" ||
+    typeof userToAdd.id !== "string" ||
+    typeof userToAdd.name !== "string" ||
+    typeof userToAdd.job !== "string"
+  ) {
+    return res.status(422).json({ error: "Invalid input" });
+  }
+  addUser(userToAdd);
+  res.send("User successfully added!");
 });
 
 app.listen(port, () => {
