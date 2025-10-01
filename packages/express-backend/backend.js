@@ -51,6 +51,10 @@ const addUser = (user) => {
   return user;
 };
 
+const updateList = (id) => {
+  users.users_list = users.users_list.filter((user) => user["id"] !== id);
+};
+
 // Basic API endpoint
 app.get("/", (req, res) => {
   res.send("Hello world!");
@@ -79,6 +83,7 @@ app.get("/users/:id", (req, res) => {
   }
 });
 
+//Add a user to users_list
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
 
@@ -93,6 +98,22 @@ app.post("/users", (req, res) => {
   }
   addUser(userToAdd);
   res.send("User successfully added!");
+});
+
+//Delete user from users_list by id
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id;
+  const result = findUserById(id);
+  if (result === undefined) {
+    res.status(404).send("Resource not found.");
+  } else {
+    updateList(id);
+  }
+
+  res.json({
+    message: "User successfully deleted!",
+    deleted: result,
+  });
 });
 
 app.listen(port, () => {
