@@ -7,10 +7,21 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+    const characterToDelete = characters[index];
+    const id = characterToDelete.id;
+    const promise = fetch(`http://localhost:8000/users/${id}`, {
+      method: "DELETE",
+    }).then((res) => {
+      if (res.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      }
+      // implement 404 once you know what it should do if users not found
     });
-    setCharacters(updated);
+
+    return promise;
   }
 
   function fetchUsers() {
@@ -28,12 +39,14 @@ function MyApp() {
   }, []);
 
   function postUser(person) {
-    const promise = fetch("Http://localhost:8000/users", {
+    const promise = fetch("http://localhost:8000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
+    }).then(async (res) => {
+      return res.json();
     });
 
     return promise;
@@ -41,7 +54,7 @@ function MyApp() {
 
   function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then((data) => setCharacters((prev) => [...prev, data.user]))
       .catch((error) => {
         console.log(error);
       });
