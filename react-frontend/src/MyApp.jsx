@@ -18,7 +18,7 @@ function MyApp() {
         });
         setCharacters(updated);
       }
-      // implement 404 once you know what it should do if users not found
+      // implement 404 once you know what it should do if user not found
     });
 
     return promise;
@@ -45,7 +45,7 @@ function MyApp() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
-    }).then(async (res) => {
+    }).then((res) => {
       return res.json();
     });
 
