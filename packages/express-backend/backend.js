@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import user_functions from "./user-services.js";
 
 const app = express();
 const port = 8000;
@@ -38,27 +39,6 @@ const users = {
   ],
 };
 
-// Function to find users by name and job
-const findUserByNameAndJob = (name, job) => {
-  return users["users_list"].filter(
-    (user) => user["name"] === name && user["job"] === job
-  );
-};
-
-// Function to find users by ID
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
-
-// Function to addUser to users_list
-const addUser = (user) => {
-  users["users_list"].push(user);
-  return user;
-};
-
-const updateList = (id) => {
-  users.users_list = users.users_list.filter((user) => user["id"] !== id);
-};
-
 // Basic API endpoint
 app.get("/", (req, res) => {
   res.send("Hello world!");
@@ -69,7 +49,7 @@ app.get("/users", (req, res) => {
   const name = req.query.name;
   const job = req.query.job;
   if (name != undefined && job != undefined) {
-    let result = findUserByNameAndJob(name, job);
+    let result = user_functions.findUserByNameAndJob(name, job);
     result = { users_list: result };
     res.send(result);
   } else {
@@ -80,7 +60,7 @@ app.get("/users", (req, res) => {
 //API endpoint to get users by ID
 app.get("/users/:id", (req, res) => {
   const id = req.params.id;
-  let result = findUserById(id);
+  let result = user_functions.findUserById(id);
   if (result === undefined) {
     res.status(404).send("Resource not found.");
   } else {
@@ -100,7 +80,10 @@ app.post("/users", (req, res) => {
     return res.status(422).json({ error: "Invalid input" });
   }
 
-  const newUser = addUser({ id: String(Math.random()), ...userToAdd });
+  const newUser = user_functions.addUser({
+    id: String(Math.random()),
+    ...userToAdd,
+  });
   return res.status(201).json({
     message: "User successfully added!",
     user: newUser,
@@ -110,11 +93,11 @@ app.post("/users", (req, res) => {
 //Delete user from users_list by id
 app.delete("/users/:id", (req, res) => {
   const id = req.params.id;
-  const result = findUserById(id);
+  const result = user_functions.findUserById(id);
   if (result === undefined) {
     return res.status(404).send("Resource not found.");
   } else {
-    updateList(id);
+    user_functions.getUsers();
   }
 
   return res.status(204).json({
