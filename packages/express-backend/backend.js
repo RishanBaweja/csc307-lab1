@@ -97,15 +97,13 @@ async function start() {
 
     //Delete user from users_list by id
     app.delete("/users/:id", (req, res) => {
-      const id = req.params.id;
-
-      if (result !== undefined) {
-        user_functions.deleteUser(id).then((result) => {
-          res.status(204).send(result);
+      const { id } = req.params.id;
+      return user_functions
+        .deleteUser(id)
+        .then((result) => res.status(204).json(result))
+        .catch((err) => {
+          console.error("deleteUser failed:", err);
         });
-      } else {
-        return res.status(404).send("Resource not found.");
-      }
     });
   } catch (err) {
     console.error("Mongo connect failed:", err);
