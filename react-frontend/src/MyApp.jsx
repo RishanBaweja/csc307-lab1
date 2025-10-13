@@ -7,8 +7,8 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index) {
-    const characterToDelete = characters[index];
-    const id = characterToDelete.id;
+    const row = characters[index];
+    const id = row._id ?? row.id;
     const promise = fetch(`http://localhost:8000/users/${id}`, {
       method: "DELETE",
     }).then((res) => {
@@ -39,22 +39,23 @@ function MyApp() {
   }, []);
 
   function postUser(person) {
-    const promise = fetch("http://localhost:8000/users", {
+    return fetch("http://localhost:8000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
     }).then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to Post User");
+      }
       return res.json();
     });
-
-    return promise;
   }
 
   function updateList(person) {
     postUser(person)
-      .then((data) => setCharacters((prev) => [...prev, data.user]))
+      .then((data) => setCharacters((prev) => [...prev, data]))
       .catch((error) => {
         console.log(error);
       });

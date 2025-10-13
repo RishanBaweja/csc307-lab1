@@ -17,7 +17,7 @@ function TableHeader() {
 function TableBody({ characterData, removeCharacter }) {
   const rows = characterData.map((row, index) => (
     <tr key={index}>
-      <td>{row.id}</td>
+      <td>{row._id ?? row.id}</td>
       <td>{row.name}</td>
       <td>{row.job}</td>
       <td>
