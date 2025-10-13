@@ -17,71 +17,40 @@ mongoose.set("debug", true);
 async function start() {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      dbName: process.env.DB_NAME, // since your URI has no db name path
-      serverSelectionTimeoutMS: 5000,
+      dbName: process.env.DB_NAME,
     });
     console.log("Mongo connected");
-
-    //List of users
-    const users = {
-      users_list: [
-        {
-          id: "xyz789",
-          name: "Charlie",
-          job: "Janitor",
-        },
-        {
-          id: "abc123",
-          name: "Mac",
-          job: "Bouncer",
-        },
-        {
-          id: "ppp222",
-          name: "Mac",
-          job: "Professor",
-        },
-        {
-          id: "yat999",
-          name: "Dee",
-          job: "Aspring actress",
-        },
-        {
-          id: "zap555",
-          name: "Dennis",
-          job: "Bartender",
-        },
-      ],
-    };
 
     // Basic API endpoint
     app.get("/", (req, res) => {
       res.send("Hello world!");
     });
 
-    //API endpoint to get user by name and job
+    //API endpoint to get users
     app.get("/users", (req, res) => {
       const name = req.query.name;
       const job = req.query.job;
 
-      if (name !== undefined && job !== undefined) {
-        user_functions.findUserByNameAndJob(name, job).then((result) => {
-          res.send(result);
+      const p =
+        name !== undefined && job !== undefined
+          ? user_functions.findUserByNameAndJob(name, job)
+          : user_functions.getUsers(name, job);
+      Promise.resolve(p)
+        .then((result) => res.status(200).json({ users_list: result ?? [] }))
+        .catch((err) => {
+          console.error("could not fetch users:", err);
         });
-      } else {
-        res.send(users);
-      }
     });
 
     //API endpoint to get users by ID
     app.get("/users/:id", (req, res) => {
-      const id = req.params.id;
-      if (id !== undefined) {
-        user_functions.findUserById(id).then((result) => {
-          res.send(result);
+      const { id } = req.params;
+      return user_functions
+        .findUserById(id)
+        .then((result) => res.status(200).json(result))
+        .catch((err) => {
+          res.status(404).json({ err: "Could not find" });
         });
-      } else {
-        res.status(404).send("Resource not found.");
-      }
     });
 
     //Add a user to users_list
@@ -97,7 +66,7 @@ async function start() {
 
     //Delete user from users_list by id
     app.delete("/users/:id", (req, res) => {
-      const { id } = req.params.id;
+      const { id } = req.params;
       return user_functions
         .deleteUser(id)
         .then((result) => res.status(204).json(result))
